@@ -2,28 +2,20 @@ import React from 'react';
 
 type State = {
   today: string;
-  clockName: string;
 };
 
-export class Clock extends React.Component<{}, State> {
+interface Props {
+  name: string;
+}
+
+export class Clock extends React.Component<Props, State> {
   state: State = {
     today: new Date().toUTCString().slice(-12, -4),
-    clockName: 'Clock-0',
   };
 
   timerTimeId = 0;
 
-  timerNameId = 0;
-
   timerConsoleId = 0;
-
-  getRandomName(): string {
-    const value = Date.now().toString().slice(-4);
-
-    return `Clock-${value}`;
-  }
-
-  //This code starts a timer
 
   componentDidMount(): void {
     this.timerTimeId = window.setInterval(() => {
@@ -31,32 +23,29 @@ export class Clock extends React.Component<{}, State> {
     }, 1000);
 
     this.timerConsoleId = window.setInterval(() => {
-      // eslint-disable-next-line no-console
-      console.log(this.state.today);
-    }, 1000);
-
-    this.timerNameId = window.setInterval(() => {
-      this.setState(prevState => {
-        const newClockName = this.getRandomName();
-
+      this.setState((prevState: Readonly<State>) => {
         // eslint-disable-next-line no-console
-        console.warn(`Renamed from ${prevState.clockName} to ${newClockName}`);
-
-        return { clockName: newClockName };
+        console.log(prevState.today);
       });
-    }, 3300);
+    }, 1000);
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.name !== this.props.name) {
+      // eslint-disable-next-line no-console
+      console.warn(`Renamed from ${prevProps.name} to ${this.props.name}`);
+    }
   }
 
   componentWillUnmount(): void {
     window.clearInterval(this.timerTimeId);
-    window.clearInterval(this.timerNameId);
     window.clearInterval(this.timerConsoleId);
   }
 
   render() {
     return (
       <div className="Clock">
-        <strong className="Clock__name">{this.state.clockName}</strong>
+        <strong className="Clock__name">{this.props.name}</strong>
 
         {' time is '}
 
